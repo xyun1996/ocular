@@ -23,7 +23,8 @@ export async function startHttpServer(config: VisionBridgeConfig, provider: Visi
 
     const server = createMcpServer(config, provider);
     const transport = new StreamableHTTPServerTransport({
-      sessionIdGenerator: undefined
+      sessionIdGenerator: undefined,
+      enableJsonResponse: true
     });
 
     try {
