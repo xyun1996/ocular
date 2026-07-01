@@ -5,6 +5,9 @@ import { authorizeHeaders, createUnauthorizedResponse } from "./auth.js";
 import { createMcpServer } from "./mcp-server.js";
 import type { VisionProvider } from "./providers/types.js";
 import { logger } from "./utils/logger.js";
+import { UPLOAD_PATH, uploadStore } from "./utils/upload-store-instance.js";
+
+const SUPPORTED_IMAGE_MIME = new Set(["image/png", "image/jpeg", "image/webp", "image/gif"]);
 
 export async function startHttpServer(config: VisionBridgeConfig, provider: VisionProvider): Promise<void> {
   if (!config.authToken) {
@@ -14,6 +17,45 @@ export async function startHttpServer(config: VisionBridgeConfig, provider: Visi
   const app = express();
   app.use(express.json({ limit: "20mb" }));
   app.use(config.httpPath, authMiddleware(config));
+
+  // Binary upload side-channel: PUT /upload/:handle with raw image bytes.
+  // Keeps large image data out of the JSON MCP tool-call path (which corrupts
+  // big base64 strings). Authenticated by the same MCP_AUTH_TOKEN.
+  app.put(
+    `${UPLOAD_PATH}/:handle`,
+    authMiddleware(config),
+    express.raw({ type: "*/*", limit: `${config.maxImageMb * 2}mb` }),
+    async (req: Request, res: Response) => {
+      const handle = Array.isArray(req.params.handle) ? req.params.handle[0] : req.params.handle;
+      const body = req.body as Buffer | undefined;
+      if (!Buffer.isBuffer(body) || body.length === 0) {
+        res.status(400).json({ error: "Request body must be raw binary image bytes (use curl --data-binary)." });
+        return;
+      }
+
+      const mimeType = (req.headers["content-type"] ?? "").split(";")[0].trim().toLowerCase();
+      if (!SUPPORTED_IMAGE_MIME.has(mimeType)) {
+        res.status(400).json({ error: `Unsupported Content-Type: ${mimeType}. Expected one of: ${[...SUPPORTED_IMAGE_MIME].join(", ")}` });
+        return;
+      }
+
+      const maxBytes = config.maxImageMb * 1024 * 1024;
+      if (body.length > maxBytes) {
+        res.status(413).json({ error: `Image too large: ${body.length} bytes. Max ${config.maxImageMb} MB.` });
+        return;
+      }
+
+      try {
+        uploadStore.stage(handle, body, mimeType);
+      } catch (error) {
+        res.status(404).json({ error: error instanceof Error ? error.message : String(error) });
+        return;
+      }
+
+      console.error(`[vision-timing] upload.stage handle=${handle} bytes=${body.length} mime=${mimeType}`);
+      res.status(200).json({ ok: true, upload_handle: handle, bytes: body.length });
+    }
+  );
 
   app.post(config.httpPath, async (req: Request, res: Response) => {
     const tReqStart = performance.now();

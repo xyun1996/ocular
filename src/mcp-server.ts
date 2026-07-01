@@ -6,6 +6,7 @@ import { analyzeChartImage, analyzeChartSchema } from "./tools/analyze-chart.js"
 import { analyzeImage, analyzeImageSchema } from "./tools/analyze-image.js";
 import { analyzeUiSchema, analyzeUiScreenshot } from "./tools/analyze-ui.js";
 import { compareUiSchema, compareUiScreenshots } from "./tools/compare-ui.js";
+import { createUploadSession, createUploadSessionSchema } from "./tools/create-upload-session.js";
 import { diagnoseErrorSchema, diagnoseErrorScreenshot } from "./tools/diagnose-error.js";
 import { extractTableFromImage, extractTableSchema } from "./tools/extract-table.js";
 import { extractTextFromImage, extractTextSchema } from "./tools/extract-text.js";
@@ -63,6 +64,13 @@ export function createMcpServer(config: VisionBridgeConfig, provider: VisionProv
     "Analyze a chart image and return labels, trends, approximate values, and limitations.",
     analyzeChartSchema,
     (args) => analyzeChartImage(args, config, provider)
+  );
+
+  server.tool(
+    "create_upload_session",
+    "Create a one-time upload session for staging a local image via a side channel (avoids base64 corruption of large images in the tool-call path). Returns an upload_url: PUT the raw image bytes there with curl --data-binary, then pass the returned upload_handle to any vision tool instead of image_base64.",
+    createUploadSessionSchema,
+    (args) => createUploadSession(args)
   );
 
   // Register empty resources and prompts handlers so that MCP clients
