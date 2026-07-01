@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.env
+.vision-cache/
+coverage/
+
+# Test images and deploy artifacts (not source code)
+test-screenshots/
+vision-bridge-mcp-deploy.tar.gz
