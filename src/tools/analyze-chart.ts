@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { VisionBridgeConfig } from "../config.js";
+import type { OcularConfig } from "../config.js";
 import { CHART_ANALYSIS_PROMPT } from "../prompts/chart.js";
 import { COMMON_SYSTEM_PROMPT } from "../prompts/common.js";
 import type { VisionProvider } from "../providers/types.js";
@@ -14,7 +14,7 @@ export const analyzeChartSchema = {
 
 export async function analyzeChartImage(
   args: z.objectOutputType<typeof analyzeChartSchema, z.ZodTypeAny>,
-  config: VisionBridgeConfig,
+  config: OcularConfig,
   provider: VisionProvider
 ) {
   const task = args.task?.trim() || "Analyze the visible chart.";

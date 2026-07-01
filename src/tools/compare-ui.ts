@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { VisionBridgeConfig } from "../config.js";
+import type { OcularConfig } from "../config.js";
 import { COMMON_SYSTEM_PROMPT } from "../prompts/common.js";
 import { COMPARE_UI_SCREENSHOTS_PROMPT } from "../prompts/compare-ui.js";
 import type { VisionProvider } from "../providers/types.js";
@@ -18,7 +18,7 @@ export const compareUiSchema = {
 
 export async function compareUiScreenshots(
   args: z.objectOutputType<typeof compareUiSchema, z.ZodTypeAny>,
-  config: VisionBridgeConfig,
+  config: OcularConfig,
   provider: VisionProvider
 ) {
   const task = args.task?.trim() || "Compare the reference UI screenshot against the actual UI screenshot.";

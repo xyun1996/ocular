@@ -1,10 +1,10 @@
 {
-  "name": "vision-bridge-mcp",
+  "name": "ocular",
   "version": "0.1.0",
-  "description": "MCP server that gives text-only coding agents vision analysis through OpenAI-compatible vision models.",
+  "description": "MCP server that gives text-only coding agents vision — analyze images through OpenAI-compatible vision models via a binary upload side channel.",
   "type": "module",
   "bin": {
-    "vision-bridge-mcp": "dist/index.js"
+    "ocular": "dist/index.js"
   },
   "scripts": {
     "build": "tsc",

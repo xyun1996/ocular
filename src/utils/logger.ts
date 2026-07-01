@@ -30,7 +30,7 @@ function sanitize(value: unknown): unknown {
 
 export const logger: Logger = {
   debug(message, metadata) {
-    if (process.env.VISION_LOG_LEVEL === "debug") {
+    if (process.env.OCULAR_LOG_LEVEL === "debug") {
       console.error(message, metadata ? sanitize(metadata) : "");
     }
   },

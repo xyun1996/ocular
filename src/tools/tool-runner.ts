@@ -1,4 +1,4 @@
-import type { VisionBridgeConfig } from "../config.js";
+import type { OcularConfig } from "../config.js";
 import { PROMPT_VERSION } from "../prompts/common.js";
 import type { VisionProvider } from "../providers/types.js";
 import { VisionCache } from "../utils/cache.js";
@@ -14,7 +14,7 @@ export interface RunVisionToolInput {
   userPrompt: string;
   task?: string;
   options: Record<string, unknown>;
-  config: VisionBridgeConfig;
+  config: OcularConfig;
   provider: VisionProvider;
 }
 
@@ -44,7 +44,7 @@ export async function runVisionTool(input: RunVisionToolInput): Promise<{ conten
     const cached = await cache.read(cacheKey);
     const tCacheRead = performance.now();
     if (cached) {
-      console.error(`[vision-timing] tool=${input.toolName} total=cache_hit ${(tCacheRead - tStart).toFixed(1)}ms validate=${(tValidate - tStart).toFixed(1)}ms cacheKey=${(tCacheKey - tValidate).toFixed(1)}ms cacheRead=${(tCacheRead - tCacheKey).toFixed(1)}ms`);
+      console.error(`[ocular] tool=${input.toolName} total=cache_hit ${(tCacheRead - tStart).toFixed(1)}ms validate=${(tValidate - tStart).toFixed(1)}ms cacheKey=${(tCacheKey - tValidate).toFixed(1)}ms cacheRead=${(tCacheRead - tCacheKey).toFixed(1)}ms`);
       return asMcpText(cached.result);
     }
 
@@ -72,12 +72,12 @@ export async function runVisionTool(input: RunVisionToolInput): Promise<{ conten
     });
     const tCacheWrite = performance.now();
 
-    console.error(`[vision-timing] tool=${input.toolName} total=${(tCacheWrite - tStart).toFixed(1)}ms validate=${(tValidate - tStart).toFixed(1)}ms cacheKey=${(tCacheKey - tValidate).toFixed(1)}ms cacheRead=${(tCacheRead - tCacheKey).toFixed(1)}ms provider=${(tProvider - tCacheRead).toFixed(1)}ms parseJson=${(tParse - tProvider).toFixed(1)}ms cacheWrite=${(tCacheWrite - tParse).toFixed(1)}ms`);
+    console.error(`[ocular] tool=${input.toolName} total=${(tCacheWrite - tStart).toFixed(1)}ms validate=${(tValidate - tStart).toFixed(1)}ms cacheKey=${(tCacheKey - tValidate).toFixed(1)}ms cacheRead=${(tCacheRead - tCacheKey).toFixed(1)}ms provider=${(tProvider - tCacheRead).toFixed(1)}ms parseJson=${(tParse - tProvider).toFixed(1)}ms cacheWrite=${(tCacheWrite - tParse).toFixed(1)}ms`);
 
     return asMcpText(result);
   } catch (error) {
     const tErr = performance.now();
-    console.error(`[vision-timing] tool=${input.toolName} ERROR total=${(tErr - tStart).toFixed(1)}ms`);
+    console.error(`[ocular] tool=${input.toolName} ERROR total=${(tErr - tStart).toFixed(1)}ms`);
     return asMcpText(toErrorResult(error));
   }
 }

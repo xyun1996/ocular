@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { VisionBridgeConfig } from "../config.js";
+import type { OcularConfig } from "../config.js";
 import { COMMON_SYSTEM_PROMPT } from "../prompts/common.js";
 import { ERROR_SCREENSHOT_PROMPT } from "../prompts/error.js";
 import type { VisionProvider } from "../providers/types.js";
@@ -14,7 +14,7 @@ export const diagnoseErrorSchema = {
 
 export async function diagnoseErrorScreenshot(
   args: z.objectOutputType<typeof diagnoseErrorSchema, z.ZodTypeAny>,
-  config: VisionBridgeConfig,
+  config: OcularConfig,
   provider: VisionProvider
 ) {
   const task = args.task?.trim() || "Diagnose the visible error screenshot for a coding agent.";

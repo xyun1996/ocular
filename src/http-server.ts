@@ -1,6 +1,6 @@
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
 import express, { type NextFunction, type Request, type Response } from "express";
-import type { VisionBridgeConfig } from "./config.js";
+import type { OcularConfig } from "./config.js";
 import { authorizeHeaders, createUnauthorizedResponse } from "./auth.js";
 import { createMcpServer } from "./mcp-server.js";
 import type { VisionProvider } from "./providers/types.js";
@@ -10,13 +10,13 @@ import { assertValidImageBytes } from "./utils/image.js";
 
 const SUPPORTED_IMAGE_MIME = new Set(["image/png", "image/jpeg", "image/webp", "image/gif"]);
 
-export async function startHttpServer(config: VisionBridgeConfig, provider: VisionProvider): Promise<void> {
+export async function startHttpServer(config: OcularConfig, provider: VisionProvider): Promise<void> {
   if (!config.authToken) {
     throw new Error("MCP_AUTH_TOKEN is required when MCP_TRANSPORT=http");
   }
 
   await initUploadStore(config).init();
-  logger.info(`vision-bridge-mcp upload store at ${config.uploadsDir}`);
+  logger.info(`ocular upload store at ${config.uploadsDir}`);
 
   const app = express();
   app.use(express.json({ limit: "20mb" }));
@@ -54,7 +54,7 @@ export async function startHttpServer(config: VisionBridgeConfig, provider: Visi
         assertValidImageBytes(body, mimeType);
       } catch (error) {
         const msg = error instanceof Error ? error.message : String(error);
-        console.error(`[vision-timing] upload.reject mime=${mimeType} bytes=${body.length} reason=${msg.slice(0, 80)}`);
+        console.error(`[ocular] upload.reject mime=${mimeType} bytes=${body.length} reason=${msg.slice(0, 80)}`);
         res.status(400).json({ error: msg });
         return;
       }
@@ -64,7 +64,7 @@ export async function startHttpServer(config: VisionBridgeConfig, provider: Visi
         const tStart = performance.now();
         const { meta, dedup } = await getUploadStore().stage(body, mimeType, originalName);
         const tEnd = performance.now();
-        console.error(`[vision-timing] upload.stage file_id=${meta.file_id} bytes=${meta.size} mime=${mimeType} dedup=${dedup ? "hit" : "miss"} stageMs=${(tEnd - tStart).toFixed(1)}`);
+        console.error(`[ocular] upload.stage file_id=${meta.file_id} bytes=${meta.size} mime=${mimeType} dedup=${dedup ? "hit" : "miss"} stageMs=${(tEnd - tStart).toFixed(1)}`);
         res.status(200).json({ ok: true, file_id: meta.file_id, bytes: meta.size, mime_type: meta.mime_type, dedup });
       } catch (error) {
         res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
@@ -76,7 +76,7 @@ export async function startHttpServer(config: VisionBridgeConfig, provider: Visi
     const tReqStart = performance.now();
     const reqMethod = (req.body as { method?: string } | null)?.method ?? "?";
     const reqId = (req.body as { id?: string | number } | null)?.id ?? "?";
-    console.error(`[vision-timing] http.req method=${reqMethod} id=${reqId} bodyBytes=${JSON.stringify(req.body ?? {}).length}`);
+    console.error(`[ocular] http.req method=${reqMethod} id=${reqId} bodyBytes=${JSON.stringify(req.body ?? {}).length}`);
 
     const server = createMcpServer(config, provider);
     const transport = new StreamableHTTPServerTransport({
@@ -89,7 +89,7 @@ export async function startHttpServer(config: VisionBridgeConfig, provider: Visi
       const tConnected = performance.now();
       await transport.handleRequest(req, res, req.body);
       const tHandled = performance.now();
-      console.error(`[vision-timing] http.resp method=${reqMethod} id=${reqId} total=${(tHandled - tReqStart).toFixed(1)}ms connect=${(tConnected - tReqStart).toFixed(1)}ms handle=${(tHandled - tConnected).toFixed(1)}ms status=${res.statusCode}`);
+      console.error(`[ocular] http.resp method=${reqMethod} id=${reqId} total=${(tHandled - tReqStart).toFixed(1)}ms connect=${(tConnected - tReqStart).toFixed(1)}ms handle=${(tHandled - tConnected).toFixed(1)}ms status=${res.statusCode}`);
       res.on("close", () => {
         void transport.close();
         void server.close();
@@ -130,14 +130,14 @@ export async function startHttpServer(config: VisionBridgeConfig, provider: Visi
 
   await new Promise<void>((resolve, reject) => {
     const server = app.listen(config.httpPort, config.httpHost, () => {
-      logger.info(`vision-bridge-mcp HTTP listening on ${config.httpHost}:${config.httpPort}${config.httpPath}`);
+      logger.info(`ocular HTTP listening on ${config.httpHost}:${config.httpPort}${config.httpPath}`);
       resolve();
     });
     server.on("error", reject);
   });
 }
 
-function authMiddleware(config: VisionBridgeConfig) {
+function authMiddleware(config: OcularConfig) {
   return (req: Request, res: Response, next: NextFunction): void => {
     const headers = new Headers();
     for (const [key, value] of Object.entries(req.headers)) {

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { VisionBridgeConfig } from "../config.js";
+import type { OcularConfig } from "../config.js";
 import { COMMON_SYSTEM_PROMPT } from "../prompts/common.js";
 import { TABLE_EXTRACTION_PROMPT } from "../prompts/table.js";
 import type { VisionProvider } from "../providers/types.js";
@@ -14,7 +14,7 @@ export const extractTableSchema = {
 
 export async function extractTableFromImage(
   args: z.objectOutputType<typeof extractTableSchema, z.ZodTypeAny>,
-  config: VisionBridgeConfig,
+  config: OcularConfig,
   provider: VisionProvider
 ) {
   const task = args.task?.trim() || "Extract visible table data from the image.";

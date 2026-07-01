@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { VisionBridgeError } from "../utils/errors.js";
+import { OcularError } from "../utils/errors.js";
 import { base64ImageToDataUrl } from "../utils/image.js";
 import { getUploadStore } from "../utils/upload-store-instance.js";
 
@@ -37,7 +37,7 @@ export async function resolveImageDataUrl(args: ImageInputArgs): Promise<string>
   if (args.file_id) {
     const stored = await getUploadStore().read(args.file_id);
     if (!stored) {
-      throw new VisionBridgeError(
+      throw new OcularError(
         "IMAGE_INPUT_MISSING",
         `file_id "${args.file_id}" is unknown or its file is missing. Upload the image first via PUT /upload (call create_upload_session for instructions).`
       );
@@ -49,7 +49,7 @@ export async function resolveImageDataUrl(args: ImageInputArgs): Promise<string>
     return base64ImageToDataUrl(args.image_base64, args.mime_type);
   }
 
-  throw new VisionBridgeError(
+  throw new OcularError(
     "IMAGE_INPUT_MISSING",
     "Either image_base64 or file_id is required."
   );

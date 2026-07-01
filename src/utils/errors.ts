@@ -1,22 +1,22 @@
-export class VisionBridgeError extends Error {
+export class OcularError extends Error {
   constructor(
     public readonly code: string,
     message: string,
     public readonly cause?: unknown
   ) {
     super(message);
-    this.name = "VisionBridgeError";
+    this.name = "OcularError";
   }
 }
 
 export function toErrorResult(error: unknown): { error: { code: string; message: string } } {
-  if (error instanceof VisionBridgeError) {
+  if (error instanceof OcularError) {
     return { error: { code: error.code, message: error.message } };
   }
 
   if (error instanceof Error) {
-    return { error: { code: "VISION_BRIDGE_ERROR", message: error.message } };
+    return { error: { code: "OCULAR_ERROR", message: error.message } };
   }
 
-  return { error: { code: "VISION_BRIDGE_ERROR", message: "Unknown vision bridge error" } };
+  return { error: { code: "OCULAR_ERROR", message: "Unknown error" } };
 }

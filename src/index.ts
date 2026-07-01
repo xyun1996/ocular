@@ -3,12 +3,12 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { loadConfig } from "./config.js";
 import { startHttpServer } from "./http-server.js";
 import { createMcpServer } from "./mcp-server.js";
-import { createVisionProvider } from "./providers/provider-factory.js";
+import { createOcularProvider } from "./providers/provider-factory.js";
 import { logger } from "./utils/logger.js";
 
 async function main(): Promise<void> {
   const config = loadConfig();
-  const provider = createVisionProvider(config);
+  const provider = createOcularProvider(config);
 
   if (config.transport === "http") {
     await startHttpServer(config, provider);
@@ -21,6 +21,6 @@ async function main(): Promise<void> {
 }
 
 main().catch((error) => {
-  logger.error(error instanceof Error ? error.message : "Failed to start vision-bridge-mcp");
+  logger.error(error instanceof Error ? error.message : "Failed to start ocular");
   process.exit(1);
 });

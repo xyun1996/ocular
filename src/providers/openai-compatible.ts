@@ -1,4 +1,4 @@
-import { VisionBridgeError } from "../utils/errors.js";
+import { OcularError } from "../utils/errors.js";
 import type { VisionAnalyzeInput, VisionAnalyzeOutput, VisionProvider } from "./types.js";
 
 export interface OpenAICompatibleConfig {
@@ -40,8 +40,8 @@ export class OpenAICompatibleVisionProvider implements VisionProvider {
       const tReadBody = performance.now();
 
       if (!response.ok) {
-        throw new VisionBridgeError(
-          "VISION_PROVIDER_REQUEST_FAILED",
+        throw new OcularError(
+          "OCULAR_PROVIDER_REQUEST_FAILED",
           `Vision provider request failed with status ${response.status}: ${rawText.slice(0, 500)}`
         );
       }
@@ -50,16 +50,16 @@ export class OpenAICompatibleVisionProvider implements VisionProvider {
       try {
         data = JSON.parse(rawText) as ChatCompletionResponse;
       } catch (error) {
-        throw new VisionBridgeError("VISION_PROVIDER_INVALID_RESPONSE", "Vision provider returned invalid response", error);
+        throw new OcularError("OCULAR_PROVIDER_INVALID_RESPONSE", "Vision provider returned invalid response", error);
       }
 
       const text = data.choices?.[0]?.message?.content;
       if (typeof text !== "string") {
-        throw new VisionBridgeError("VISION_PROVIDER_INVALID_RESPONSE", "Vision provider returned invalid response");
+        throw new OcularError("OCULAR_PROVIDER_INVALID_RESPONSE", "Vision provider returned invalid response");
       }
 
       const tEnd = performance.now();
-      console.error(`[vision-timing] provider.analyze total=${(tEnd - tStart).toFixed(1)}ms buildRequest=${(tBuildRequest - tStart).toFixed(1)}ms fetch=${(tFetchDone - tBuildRequest).toFixed(1)}ms readBody=${(tReadBody - tFetchDone).toFixed(1)}ms parse=${(tEnd - tReadBody).toFixed(1)}ms model=${this.config.model} promptTokens=${data.usage?.prompt_tokens ?? "?"} completionTokens=${data.usage?.completion_tokens ?? "?"}`);
+      console.error(`[ocular] provider.analyze total=${(tEnd - tStart).toFixed(1)}ms buildRequest=${(tBuildRequest - tStart).toFixed(1)}ms fetch=${(tFetchDone - tBuildRequest).toFixed(1)}ms readBody=${(tReadBody - tFetchDone).toFixed(1)}ms parse=${(tEnd - tReadBody).toFixed(1)}ms model=${this.config.model} promptTokens=${data.usage?.prompt_tokens ?? "?"} completionTokens=${data.usage?.completion_tokens ?? "?"}`);
 
       return {
         text,
@@ -77,7 +77,7 @@ export class OpenAICompatibleVisionProvider implements VisionProvider {
 
   async buildRequest(input: VisionAnalyzeInput): Promise<{ url: string; init: RequestInit }> {
     if (!input.imageDataUrl && !input.imageDataUrls?.length) {
-      throw new VisionBridgeError("IMAGE_INPUT_MISSING", "image_base64 is required");
+      throw new OcularError("IMAGE_INPUT_MISSING", "image_base64 is required");
     }
 
     const imageUrls = await this.resolveImageUrls(input);
@@ -127,6 +127,6 @@ export class OpenAICompatibleVisionProvider implements VisionProvider {
       return [input.imageDataUrl];
     }
 
-    throw new VisionBridgeError("IMAGE_INPUT_MISSING", "image_base64 is required");
+    throw new OcularError("IMAGE_INPUT_MISSING", "image_base64 is required");
   }
 }

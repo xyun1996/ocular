@@ -60,7 +60,13 @@ describe("OpenAICompatibleVisionProvider", () => {
         })
       ])
     );
-    expect(consoleSpy).not.toHaveBeenCalled();
+    // Timing logs (prefixed [ocular]) are expected on the success path; only
+    // non-timing error output would be a regression.
+    for (const call of consoleSpy.mock.calls) {
+      const msg = String(call[0] ?? "");
+      if (msg.startsWith("[ocular]")) continue;
+      throw new Error(`Unexpected non-timing console.error: ${msg}`);
+    }
     expect(result).toMatchObject({
       text: "{\"summary\":\"ok\"}",
       usage: { promptTokens: 1, completionTokens: 2, totalTokens: 3 }

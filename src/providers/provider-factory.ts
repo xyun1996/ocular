@@ -1,8 +1,8 @@
-import type { VisionBridgeConfig } from "../config.js";
+import type { OcularConfig } from "../config.js";
 import { OpenAICompatibleVisionProvider } from "./openai-compatible.js";
 import type { VisionProvider } from "./types.js";
 
-export function createVisionProvider(config: VisionBridgeConfig): VisionProvider {
+export function createOcularProvider(config: OcularConfig): VisionProvider {
   return new OpenAICompatibleVisionProvider({
     baseUrl: config.baseUrl,
     apiKey: config.apiKey,

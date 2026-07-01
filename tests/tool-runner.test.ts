@@ -1,11 +1,11 @@
 import { describe, expect, test, vi } from "vitest";
-import type { VisionBridgeConfig } from "../src/config.js";
+import type { OcularConfig } from "../src/config.js";
 import type { VisionProvider } from "../src/providers/types.js";
 import { analyzeImage } from "../src/tools/analyze-image.js";
 import { runVisionTool } from "../src/tools/tool-runner.js";
 import { makeTempDir } from "./helpers.js";
 
-function makeConfig(cacheDir: string): VisionBridgeConfig {
+function makeConfig(cacheDir: string): OcularConfig {
   return {
     transport: "stdio",
     httpHost: "127.0.0.1",

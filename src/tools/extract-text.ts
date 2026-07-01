@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { VisionBridgeConfig } from "../config.js";
+import type { OcularConfig } from "../config.js";
 import { COMMON_SYSTEM_PROMPT } from "../prompts/common.js";
 import { OCR_PROMPT } from "../prompts/ocr.js";
 import type { VisionProvider } from "../providers/types.js";
@@ -15,7 +15,7 @@ export const extractTextSchema = {
 
 export async function extractTextFromImage(
   args: z.objectOutputType<typeof extractTextSchema, z.ZodTypeAny>,
-  config: VisionBridgeConfig,
+  config: OcularConfig,
   provider: VisionProvider
 ) {
   const userPrompt = `${OCR_PROMPT}

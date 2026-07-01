@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { VisionBridgeError } from "./errors.js";
+import { OcularError } from "./errors.js";
 
 export interface ImageValidationOptions {
   maxImageMb: number;
@@ -28,7 +28,7 @@ export function validateImageDataUrl(dataUrl: string, options: ImageValidationOp
 
   const maxBytes = options.maxImageMb * 1024 * 1024;
   if (Buffer.byteLength(base64, "base64") > maxBytes) {
-    throw new VisionBridgeError(
+    throw new OcularError(
       "IMAGE_FILE_TOO_LARGE",
       `Image file too large. Max size is ${options.maxImageMb} MB.`
     );
@@ -43,20 +43,20 @@ export function hashImageDataUrl(dataUrl: string): string {
 function parseImageDataUrl(dataUrl: string): { mimeType: string; base64: string } {
   const match = IMAGE_DATA_URL_PATTERN.exec(dataUrl);
   if (!match) {
-    throw new VisionBridgeError("INVALID_IMAGE_DATA_URL", "Image data URL must be data:image/...;base64,...");
+    throw new OcularError("INVALID_IMAGE_DATA_URL", "Image data URL must be data:image/...;base64,...");
   }
   return { mimeType: match[1], base64: match[2] };
 }
 
 function validateMimeType(mimeType: string): void {
   if (!SUPPORTED_MIME_TYPES.has(mimeType)) {
-    throw new VisionBridgeError("UNSUPPORTED_IMAGE_FORMAT", `Unsupported image format: ${mimeType}`);
+    throw new OcularError("UNSUPPORTED_IMAGE_FORMAT", `Unsupported image format: ${mimeType}`);
   }
 }
 
 function validateBase64(value: string): void {
   if (!/^[A-Za-z0-9+/]+={0,2}$/.test(value)) {
-    throw new VisionBridgeError("INVALID_IMAGE_BASE64", "Image base64 is invalid");
+    throw new OcularError("INVALID_IMAGE_BASE64", "Image base64 is invalid");
   }
 }
 
@@ -85,23 +85,23 @@ export function detectImageMimeType(buffer: Buffer): string | null {
 
 /**
  * Assert that buffer is a valid, non-empty image whose signature matches the
- * declared mimeType. Throws a VisionBridgeError with a helpful message on
+ * declared mimeType. Throws a OcularError with a helpful message on
  * mismatch -- used by the PUT /upload endpoint to fail fast on bad uploads
  * (empty body, wrong file, text/html error page, etc).
  */
 export function assertValidImageBytes(buffer: Buffer, mimeType: string): void {
   if (buffer.length === 0) {
-    throw new VisionBridgeError("INVALID_IMAGE_BASE64", "Uploaded file is empty. Check that the local file exists and is non-empty before uploading.");
+    throw new OcularError("INVALID_IMAGE_BASE64", "Uploaded file is empty. Check that the local file exists and is non-empty before uploading.");
   }
   const detected = detectImageMimeType(buffer);
   if (!detected) {
-    throw new VisionBridgeError(
+    throw new OcularError(
       "UNSUPPORTED_IMAGE_FORMAT",
       `Uploaded bytes do not match any supported image signature (png/jpeg/webp/gif). Got ${buffer.length} bytes; first bytes: ${buffer.slice(0, 16).toString("hex")}. This usually means the file does not exist, is not an image, or curl uploaded an error message instead.`
     );
   }
   if (detected !== mimeType) {
-    throw new VisionBridgeError(
+    throw new OcularError(
       "UNSUPPORTED_IMAGE_FORMAT",
       `Content-Type "${mimeType}" does not match the uploaded image signature (detected ${detected}). Send the correct Content-Type header.`
     );

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { VisionBridgeConfig } from "../config.js";
+import type { OcularConfig } from "../config.js";
 import { getPublicUploadUrl } from "../utils/upload-store-instance.js";
 
 export const createUploadSessionSchema = {
@@ -25,7 +25,7 @@ export interface UploadInstructions {
  */
 export async function createUploadSession(
   args: { mime_type: string },
-  config: VisionBridgeConfig
+  config: OcularConfig
 ): Promise<{ content: Array<{ type: "text"; text: string }> }> {
   const uploadUrl = getPublicUploadUrl(config);
   const authHeader = `${config.authScheme} ${config.authToken}`;

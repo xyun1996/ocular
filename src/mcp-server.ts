@@ -1,6 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { ListResourcesRequestSchema, ListPromptsRequestSchema } from "@modelcontextprotocol/sdk/types.js";
-import type { VisionBridgeConfig } from "./config.js";
+import type { OcularConfig } from "./config.js";
 import type { VisionProvider } from "./providers/types.js";
 import { analyzeChartImage, analyzeChartSchema } from "./tools/analyze-chart.js";
 import { analyzeImage, analyzeImageSchema } from "./tools/analyze-image.js";
@@ -11,9 +11,9 @@ import { diagnoseErrorSchema, diagnoseErrorScreenshot } from "./tools/diagnose-e
 import { extractTableFromImage, extractTableSchema } from "./tools/extract-table.js";
 import { extractTextFromImage, extractTextSchema } from "./tools/extract-text.js";
 
-export function createMcpServer(config: VisionBridgeConfig, provider: VisionProvider): McpServer {
+export function createMcpServer(config: OcularConfig, provider: VisionProvider): McpServer {
   const server = new McpServer({
-    name: "vision-bridge-mcp",
+    name: "ocular",
     version: "0.1.0"
   });
 

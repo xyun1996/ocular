@@ -1,9 +1,10 @@
 node_modules/
 dist/
 .env
-.vision-cache/
+.ocular-cache/
+.ocular-uploads/
 coverage/
 
 # Test images and deploy artifacts (not source code)
 test-screenshots/
-vision-bridge-mcp-deploy.tar.gz
+*.deploy.tar.gz

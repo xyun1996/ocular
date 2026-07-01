@@ -1,11 +1,11 @@
 import { UploadStore } from "./upload-store.js";
-import type { VisionBridgeConfig } from "../config.js";
+import type { OcularConfig } from "../config.js";
 
 let instance: UploadStore | null = null;
 
 export const UPLOAD_PATH = "/upload";
 
-export function initUploadStore(config: VisionBridgeConfig): UploadStore {
+export function initUploadStore(config: OcularConfig): UploadStore {
   instance = new UploadStore(config.uploadsDir);
   return instance;
 }
@@ -17,6 +17,6 @@ export function getUploadStore(): UploadStore {
   return instance;
 }
 
-export function getPublicUploadUrl(config: VisionBridgeConfig): string {
+export function getPublicUploadUrl(config: OcularConfig): string {
   return config.publicUploadUrl;
 }

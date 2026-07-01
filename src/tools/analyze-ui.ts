@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { VisionBridgeConfig } from "../config.js";
+import type { OcularConfig } from "../config.js";
 import { COMMON_SYSTEM_PROMPT } from "../prompts/common.js";
 import { UI_ANALYSIS_PROMPT } from "../prompts/ui.js";
 import type { VisionProvider } from "../providers/types.js";
@@ -15,7 +15,7 @@ export const analyzeUiSchema = {
 
 export async function analyzeUiScreenshot(
   args: z.objectOutputType<typeof analyzeUiSchema, z.ZodTypeAny>,
-  config: VisionBridgeConfig,
+  config: OcularConfig,
   provider: VisionProvider
 ) {
   const task = args.task?.trim() || "Analyze the UI screenshot and return implementation-useful visual observations.";

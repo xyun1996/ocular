@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { VisionBridgeConfig } from "../config.js";
+import type { OcularConfig } from "../config.js";
 import { COMMON_SYSTEM_PROMPT } from "../prompts/common.js";
 import { GENERIC_ANALYSIS_PROMPT } from "../prompts/generic.js";
 import type { VisionProvider } from "../providers/types.js";
@@ -14,7 +14,7 @@ export const analyzeImageSchema = {
 
 export async function analyzeImage(
   args: z.objectOutputType<typeof analyzeImageSchema, z.ZodTypeAny>,
-  config: VisionBridgeConfig,
+  config: OcularConfig,
   provider: VisionProvider
 ) {
   const task = args.task?.trim() || "Perform a general image analysis.";
