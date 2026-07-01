@@ -70,7 +70,7 @@ export function createMcpServer(config: VisionBridgeConfig, provider: VisionProv
     "create_upload_session",
     "Create a one-time upload session for staging a local image via a side channel (avoids base64 corruption of large images in the tool-call path). Returns an upload_url: PUT the raw image bytes there with curl --data-binary, then pass the returned upload_handle to any vision tool instead of image_base64.",
     createUploadSessionSchema,
-    (args) => createUploadSession(args)
+    (args) => createUploadSession(args, config)
   );
 
   // Register empty resources and prompts handlers so that MCP clients

@@ -27,7 +27,7 @@ Return valid JSON with the requested fields.`;
 
   return runVisionTool({
     toolName: "extract_text_from_image",
-    ...imageInputFromArgs(args),
+    ...(await imageInputFromArgs(args)),
     systemPrompt: COMMON_SYSTEM_PROMPT,
     userPrompt,
     task: "ocr",

@@ -26,7 +26,7 @@ Return valid JSON unless the requested format explicitly requires otherwise.`;
 
   return runVisionTool({
     toolName: "analyze_image",
-    ...imageInputFromArgs(args),
+    ...(await imageInputFromArgs(args)),
     systemPrompt: COMMON_SYSTEM_PROMPT,
     userPrompt,
     task,

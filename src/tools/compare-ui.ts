@@ -31,7 +31,7 @@ Return valid JSON with the requested fields.`;
 
   return runVisionTool({
     toolName: "compare_ui_screenshots",
-    ...imageInputsFromArgs(args),
+    ...(await imageInputsFromArgs(args)),
     systemPrompt: COMMON_SYSTEM_PROMPT,
     userPrompt,
     task,

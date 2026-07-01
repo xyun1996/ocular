@@ -28,7 +28,7 @@ Return valid JSON with the requested fields.`;
 
   return runVisionTool({
     toolName: "analyze_ui_screenshot",
-    ...imageInputFromArgs(args),
+    ...(await imageInputFromArgs(args)),
     systemPrompt: COMMON_SYSTEM_PROMPT,
     userPrompt,
     task,

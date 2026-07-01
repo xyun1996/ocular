@@ -20,6 +20,8 @@ export interface VisionBridgeConfig {
   maxImageMb: number;
   cacheEnabled: boolean;
   cacheDir: string;
+  uploadsDir: string;
+  publicUploadUrl: string;
 }
 
 function readNumber(name: string, defaultValue: number): number {
@@ -91,7 +93,9 @@ export function loadConfig(): VisionBridgeConfig {
     timeoutMs: readNumber("VISION_TIMEOUT_MS", 60_000),
     maxImageMb: readNumber("VISION_MAX_IMAGE_MB", 10),
     cacheEnabled: readBoolean("VISION_CACHE_ENABLED", true),
-    cacheDir: process.env.VISION_CACHE_DIR ?? ".vision-cache"
+    cacheDir: process.env.VISION_CACHE_DIR ?? ".vision-cache",
+    uploadsDir: process.env.VISION_UPLOADS_DIR ?? ".vision-uploads",
+    publicUploadUrl: (process.env.VISION_UPLOAD_URL_BASE ?? `http://${process.env.MCP_HTTP_HOST ?? "127.0.0.1"}:${process.env.MCP_HTTP_PORT ?? "3000"}`).replace(/\/+$/, "") + "/upload"
   };
 }
 

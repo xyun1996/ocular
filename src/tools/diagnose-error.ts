@@ -26,7 +26,7 @@ Return valid JSON with the requested fields.`;
 
   return runVisionTool({
     toolName: "diagnose_error_screenshot",
-    ...imageInputFromArgs(args),
+    ...(await imageInputFromArgs(args)),
     systemPrompt: COMMON_SYSTEM_PROMPT,
     userPrompt,
     task,
