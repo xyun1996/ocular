@@ -68,7 +68,7 @@ export function createMcpServer(config: VisionBridgeConfig, provider: VisionProv
 
   server.tool(
     "create_upload_session",
-    "Create a one-time upload session for staging a local image via a side channel (avoids base64 corruption of large images in the tool-call path). Returns an upload_url: PUT the raw image bytes there with curl --data-binary, then pass the returned upload_handle to any vision tool instead of image_base64.",
+    "Returns upload instructions for the binary side channel (use this to analyze LOCAL image files without base64 corruption). Before uploading, verify the local file exists and is non-empty with Bash (e.g. `ls -la <path>` or `test -f <path> && stat -c %s <path>`). Then PUT the raw bytes to the returned upload_url with curl --data-binary (NOT base64); the response gives a file_id to pass to any vision tool. Stateless -- call once to learn the endpoint.",
     createUploadSessionSchema,
     (args) => createUploadSession(args, config)
   );

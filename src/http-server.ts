@@ -6,6 +6,7 @@ import { createMcpServer } from "./mcp-server.js";
 import type { VisionProvider } from "./providers/types.js";
 import { logger } from "./utils/logger.js";
 import { UPLOAD_PATH, initUploadStore, getUploadStore } from "./utils/upload-store-instance.js";
+import { assertValidImageBytes } from "./utils/image.js";
 
 const SUPPORTED_IMAGE_MIME = new Set(["image/png", "image/jpeg", "image/webp", "image/gif"]);
 
@@ -44,6 +45,17 @@ export async function startHttpServer(config: VisionBridgeConfig, provider: Visi
       const maxBytes = config.maxImageMb * 1024 * 1024;
       if (body.length > maxBytes) {
         res.status(413).json({ error: `Image too large: ${body.length} bytes. Max ${config.maxImageMb} MB.` });
+        return;
+      }
+
+      // Validate image signature (magic bytes) matches declared Content-Type.
+      // Catches empty bodies, non-image uploads, and curl sending an error page.
+      try {
+        assertValidImageBytes(body, mimeType);
+      } catch (error) {
+        const msg = error instanceof Error ? error.message : String(error);
+        console.error(`[vision-timing] upload.reject mime=${mimeType} bytes=${body.length} reason=${msg.slice(0, 80)}`);
+        res.status(400).json({ error: msg });
         return;
       }
 

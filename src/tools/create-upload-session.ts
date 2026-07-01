@@ -31,7 +31,10 @@ export async function createUploadSession(
   const authHeader = `${config.authScheme} ${config.authToken}`;
 
   const nextStep = [
-    `Upload the local image bytes with curl (raw binary, NOT base64):`,
+    `Before uploading, verify the local image file exists and is non-empty:`,
+    `  ls -la /path/to/your/image.${extFor(args.mime_type)}   # must show a non-zero size`,
+    `If that fails, the file does not exist -- fix the path before proceeding.`,
+    `Then upload the raw image bytes with curl (raw binary, NOT base64):`,
     `  curl --request PUT --data-binary @/path/to/your/image.${extFor(args.mime_type)} "${uploadUrl}" -H "Content-Type: ${args.mime_type}" -H "${config.authHeader}: ${authHeader}"`,
     `The response returns a file_id (content-addressed, deduplicated -- same image always yields the same file_id).`,
     `Then call any vision tool (e.g. analyze_image) passing file_id="<returned id>". The file_id is persistent across server restarts.`
