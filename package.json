@@ -1,5 +1,5 @@
 {
-  "name": "ocular",
+  "name": "ocular-mcp",
   "version": "0.1.0",
   "description": "MCP server that gives coding agents vision through OpenAI-compatible multimodal models, with reliable binary image uploads for remote deployments.",
   "license": "MIT",
