@@ -1,6 +1,7 @@
 {
   "name": "ocular-mcp",
   "version": "0.1.0",
+  "mcpName": "io.github.xyun1996/ocular",
   "description": "MCP server that gives coding agents vision through OpenAI-compatible multimodal models, with reliable binary image uploads for remote deployments.",
   "license": "MIT",
   "author": "xyun1996",
@@ -30,7 +31,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "dev": "tsx src/index.ts",
-    "check": "npm run build && npm test && node --check scripts/provider-smoke.mjs && node --check scripts/benchmark-fixtures.mjs",
+    "check": "npm run build && npm test && node --check scripts/provider-smoke.mjs && node --check scripts/benchmark-fixtures.mjs && node scripts/check-registry-metadata.mjs",
     "smoke:provider": "npm run build && node scripts/provider-smoke.mjs",
     "bench:fixtures": "npm run build && node scripts/benchmark-fixtures.mjs",
     "prepublishOnly": "npm run check"
