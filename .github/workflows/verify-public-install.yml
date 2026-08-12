@@ -1,0 +1,38 @@
+name: Verify public npm install
+
+on:
+  push:
+    branches: [verify/npm-public-install]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20, 22]
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          registry-url: https://registry.npmjs.org
+
+      - name: Install published package in a clean project
+        run: |
+          mkdir public-install-test
+          cd public-install-test
+          npm init -y >/dev/null
+          npm install ocular-mcp@0.1.0 --registry=https://registry.npmjs.org/
+          node -e "const p=require('./node_modules/ocular-mcp/package.json'); if(p.name!=='ocular-mcp'||p.version!=='0.1.0'||p.bin?.ocular!=='dist/index.js') process.exit(1); console.log(p.name+'@'+p.version+' bin='+p.bin.ocular)"
+          test -x node_modules/.bin/ocular
+
+      - name: Verify published CLI reaches ocular configuration validation
+        run: |
+          cd public-install-test
+          set +e
+          env -u OCULAR_BASE_URL -u OCULAR_API_KEY -u OCULAR_MODEL ./node_modules/.bin/ocular >stdout.log 2>stderr.log
+          status=$?
+          set -e
+          cat stderr.log
+          test "$status" -ne 0
+          grep -q 'OCULAR_BASE_URL is missing' stderr.log
+          echo 'published CLI smoke test passed'
