@@ -1,14 +1,31 @@
 # Claude Code + ocular
 
-This walkthrough connects a local `ocular` server to Claude Code and uses a vision-capable provider to inspect screenshots.
+This walkthrough connects the published `ocular` MCP server to Claude Code and uses a vision-capable OpenAI-compatible provider to inspect screenshots.
 
 ## Prerequisites
 
 - Node.js 20+
 - Claude Code installed
-- An API key for an OpenAI-compatible vision provider, or a local compatible endpoint
+- An API key for an OpenAI-compatible multimodal provider, or a local compatible endpoint
 
-## Build ocular
+## Install ocular
+
+The published npm package is `ocular-mcp`. It exposes the CLI command `ocular`.
+
+You can use it without a global install:
+
+```bash
+npx -y ocular-mcp
+```
+
+Or install it globally:
+
+```bash
+npm install -g ocular-mcp
+ocular
+```
+
+To work on the source instead:
 
 ```bash
 git clone https://github.com/xyun1996/ocular.git
@@ -17,7 +34,23 @@ npm install
 npm run build
 ```
 
-## Option A: configure through `.env`
+## Option A: register the npm package directly
+
+Pass provider settings when registering the MCP server:
+
+```bash
+claude mcp add ocular \
+  -e OCULAR_BASE_URL=https://your-openai-compatible-endpoint.example/v1 \
+  -e OCULAR_MODEL=your_vision_model \
+  -e OCULAR_API_KEY=your_api_key \
+  -- npx -y ocular-mcp
+```
+
+Avoid putting real API keys in shell history on shared machines. Prefer your client's environment or secret-management mechanism for persistent setups.
+
+## Option B: run from source
+
+Create a local `.env` file:
 
 ```bash
 cp .env.example .env
@@ -26,28 +59,17 @@ cp .env.example .env
 Example:
 
 ```env
-OCULAR_BASE_URL=https://api.openai.com/v1
+OCULAR_BASE_URL=https://your-openai-compatible-endpoint.example/v1
 OCULAR_API_KEY=your_api_key
-OCULAR_MODEL=gpt-4o-mini
+OCULAR_MODEL=your_vision_model
 ```
 
-Register the local MCP server:
+Build and register the local server:
 
 ```bash
+npm run build
 claude mcp add ocular -- node /absolute/path/to/ocular/dist/index.js
 ```
-
-## Option B: pass provider settings when registering
-
-```bash
-claude mcp add ocular \
-  -e OCULAR_BASE_URL=https://api.openai.com/v1 \
-  -e OCULAR_MODEL=gpt-4o-mini \
-  -e OCULAR_API_KEY=your_api_key \
-  -- node /absolute/path/to/ocular/dist/index.js
-```
-
-Avoid putting real API keys in shell history on shared machines. An environment file or secret-management approach is preferable for persistent setups.
 
 ## Suggested prompts
 
@@ -69,6 +91,10 @@ Use ocular to compare the reference screenshot and my current implementation. Li
 
 In local stdio mode the client and server share the same machine. The vision tools support inline image data, while remote deployments should generally use the binary upload flow described in [`../docs/architecture.md`](../docs/architecture.md).
 
+## Provider compatibility
+
+An endpoint advertising an OpenAI-compatible API is not automatically considered verified. See [`../docs/provider-compatibility.md`](../docs/provider-compatibility.md) for the reproducible smoke-test procedure and tested endpoint/model combinations.
+
 ## Troubleshooting
 
 ### Provider request fails
@@ -78,19 +104,20 @@ Verify:
 - `OCULAR_BASE_URL` points to the provider's OpenAI-compatible base URL.
 - `OCULAR_MODEL` is vision-capable.
 - `OCULAR_API_KEY` is valid for that provider.
-- The provider accepts the OpenAI-compatible multimodal request shape.
+- The endpoint accepts the multimodal request shape ocular sends.
 
 ### Server does not start
 
-Run the project checks directly:
+For the npm package, confirm the installed CLI reaches ocular's configuration validation:
+
+```bash
+npx -y ocular-mcp
+```
+
+For a source checkout, run:
 
 ```bash
 npm run check
-```
-
-Then run the server in development mode to inspect stderr output:
-
-```bash
 npm run dev
 ```
 
