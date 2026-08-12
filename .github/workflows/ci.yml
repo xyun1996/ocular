@@ -9,13 +9,32 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20, 22]
+
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: ${{ matrix.node-version }}
           cache: npm
 
       - run: npm ci
       - run: npm run check
+
+      - name: Verify npm package contents
+        run: |
+          npm pack --dry-run --json > pack.json
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const pack = JSON.parse(fs.readFileSync('pack.json', 'utf8'))[0];
+          const files = new Set(pack.files.map((file) => file.path));
+          const required = ['dist/index.js', 'README.md', 'LICENSE', '.env.example'];
+          const missing = required.filter((file) => !files.has(file));
+          if (missing.length) {
+            throw new Error(`npm package is missing required files: ${missing.join(', ')}`);
+          }
+          console.log(`npm package contains ${pack.files.length} files (${pack.size} bytes)`);
+          NODE
