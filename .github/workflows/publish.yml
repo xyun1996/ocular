@@ -1,0 +1,81 @@
+name: Publish npm package
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: npm-publish-${{ github.event.release.tag_name }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.release.tag_name }}
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          registry-url: 'https://registry.npmjs.org'
+          package-manager-cache: false
+
+      - name: Ensure npm supports trusted publishing
+        run: |
+          npm install --global 'npm@^11.5.1'
+          npm --version
+
+      - name: Verify release tag matches package version
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+          const tag = process.env.RELEASE_TAG;
+          const expected = `v${pkg.version}`;
+          if (tag !== expected) {
+            throw new Error(`release tag ${tag} does not match package version ${pkg.version} (expected ${expected})`);
+          }
+          console.log(`release ${tag} matches ${pkg.name}@${pkg.version}`);
+          NODE
+
+      - run: npm ci
+      - run: npm run check
+
+      - name: Verify npm package contents
+        run: |
+          npm pack --dry-run --json > pack.json
+          node - <<'NODE'
+          const fs = require('node:fs');
+          const pack = JSON.parse(fs.readFileSync('pack.json', 'utf8'))[0];
+          const files = new Set(pack.files.map((file) => file.path));
+          const required = ['dist/index.js', 'README.md', 'LICENSE', '.env.example'];
+          const missing = required.filter((file) => !files.has(file));
+          if (missing.length) {
+            throw new Error(`npm package is missing required files: ${missing.join(', ')}`);
+          }
+          console.log(`npm package contains ${pack.files.length} files (${pack.size} bytes)`);
+          NODE
+
+      - name: Check whether this version is already published
+        id: registry
+        run: |
+          PACKAGE_NAME="$(node -p "require('./package.json').name")"
+          PACKAGE_VERSION="$(node -p "require('./package.json').version")"
+          if npm view "${PACKAGE_NAME}@${PACKAGE_VERSION}" version >/dev/null 2>&1; then
+            echo "already_published=true" >> "$GITHUB_OUTPUT"
+            echo "${PACKAGE_NAME}@${PACKAGE_VERSION} already exists on npm; skipping duplicate publish"
+          else
+            echo "already_published=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publish with npm Trusted Publishing
+        if: steps.registry.outputs.already_published != 'true'
+        run: npm publish --access public
