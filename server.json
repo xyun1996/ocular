@@ -1,0 +1,44 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.xyun1996/ocular",
+  "title": "ocular",
+  "description": "Vision tools for coding agents: screenshots, OCR, UI diffs, errors, tables, and charts.",
+  "repository": {
+    "url": "https://github.com/xyun1996/ocular",
+    "source": "github"
+  },
+  "version": "0.1.0",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "ocular-mcp",
+      "version": "0.1.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "OCULAR_BASE_URL",
+          "description": "OpenAI-compatible API base URL",
+          "isRequired": true,
+          "format": "string",
+          "isSecret": false
+        },
+        {
+          "name": "OCULAR_API_KEY",
+          "description": "API key for the configured vision model provider",
+          "isRequired": true,
+          "format": "string",
+          "isSecret": true
+        },
+        {
+          "name": "OCULAR_MODEL",
+          "description": "Vision-capable model identifier",
+          "isRequired": true,
+          "format": "string",
+          "isSecret": false
+        }
+      ]
+    }
+  ]
+}
