@@ -1,7 +1,26 @@
 {
   "name": "ocular",
   "version": "0.1.0",
-  "description": "MCP server that gives text-only coding agents vision — analyze images through OpenAI-compatible vision models via a binary upload side channel.",
+  "description": "MCP server that gives coding agents vision through OpenAI-compatible multimodal models, with reliable binary image uploads for remote deployments.",
+  "license": "MIT",
+  "author": "xyun1996",
+  "homepage": "https://github.com/xyun1996/ocular#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xyun1996/ocular.git"
+  },
+  "bugs": {
+    "url": "https://github.com/xyun1996/ocular/issues"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "vision",
+    "multimodal",
+    "coding-agent",
+    "image-analysis",
+    "typescript"
+  ],
   "type": "module",
   "bin": {
     "ocular": "dist/index.js"
@@ -9,7 +28,10 @@
   "scripts": {
     "build": "tsc",
     "test": "vitest run",
-    "dev": "tsx src/index.ts"
+    "test:watch": "vitest",
+    "dev": "tsx src/index.ts",
+    "check": "npm run build && npm test",
+    "prepublishOnly": "npm run check"
   },
   "engines": {
     "node": ">=20"
@@ -17,8 +39,12 @@
   "files": [
     "dist",
     "README.md",
-    ".env.example"
+    ".env.example",
+    "LICENSE"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.17.5",
     "dotenv": "^16.4.7",
