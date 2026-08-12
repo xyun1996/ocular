@@ -1,0 +1,75 @@
+name: Bug report
+description: Report a reproducible problem in ocular
+title: "[Bug]: "
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a problem. Please remove API keys, auth tokens, and private image data before posting logs or screenshots.
+  - type: input
+    id: version
+    attributes:
+      label: ocular version or commit
+      placeholder: v0.1.0 or commit SHA
+    validations:
+      required: true
+  - type: dropdown
+    id: transport
+    attributes:
+      label: MCP transport
+      options:
+        - stdio
+        - HTTP
+        - Other / unsure
+    validations:
+      required: true
+  - type: input
+    id: client
+    attributes:
+      label: MCP client
+      description: For example Claude Code, Claude Desktop, or another MCP client.
+    validations:
+      required: true
+  - type: input
+    id: provider
+    attributes:
+      label: Vision provider and model
+      description: Do not include credentials.
+      placeholder: OpenAI-compatible endpoint + model name
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Configure ...
+        2. Start ...
+        3. Call tool ...
+        4. Observe ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs or structured output
+      description: Redact API keys, MCP tokens, private URLs, and sensitive image content.
+      render: text
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Include OS, Node.js version, proxy setup, or minimal reproduction details when relevant.
