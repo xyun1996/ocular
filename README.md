@@ -273,7 +273,7 @@ Contributions are welcome. Start with [CONTRIBUTING.md](CONTRIBUTING.md), run `n
 
 The npm package is `ocular-mcp`; the installed CLI is `ocular`. Release automation uses npm Trusted Publishing rather than a long-lived repository token. See [Publishing](docs/publishing.md).
 
-The project is also prepared for the official MCP Registry under `io.github.xyun1996/ocular`. See [MCP Registry](docs/mcp-registry.md).
+`ocular` is published in the official MCP Registry as [`io.github.xyun1996/ocular`](https://registry.modelcontextprotocol.io/v0.1/servers?search=io.github.xyun1996%2Focular). See [MCP Registry](docs/mcp-registry.md) for the live identity and release flow.
 
 ## License
 
