@@ -1,4 +1,4 @@
-name: Publish npm package
+name: Publish release artifacts
 
 on:
   release:
@@ -9,7 +9,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: npm-publish-${{ github.event.release.tag_name }}
+  group: release-publish-${{ github.event.release.tag_name }}
   cancel-in-progress: false
 
 jobs:
@@ -64,8 +64,8 @@ jobs:
           console.log(`npm package contains ${pack.files.length} files (${pack.size} bytes)`);
           NODE
 
-      - name: Check whether this version is already published
-        id: registry
+      - name: Check whether this npm version is already published
+        id: npm_registry
         run: |
           PACKAGE_NAME="$(node -p "require('./package.json').name")"
           PACKAGE_VERSION="$(node -p "require('./package.json').version")"
@@ -76,6 +76,34 @@ jobs:
             echo "already_published=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Publish with npm Trusted Publishing
-        if: steps.registry.outputs.already_published != 'true'
+      - name: Publish npm package with Trusted Publishing
+        if: steps.npm_registry.outputs.already_published != 'true'
         run: npm publish --access public
+
+      - name: Wait for npm package visibility
+        run: |
+          PACKAGE_NAME="$(node -p "require('./package.json').name")"
+          PACKAGE_VERSION="$(node -p "require('./package.json').version")"
+          for attempt in $(seq 1 12); do
+            if npm view "${PACKAGE_NAME}@${PACKAGE_VERSION}" version >/dev/null 2>&1; then
+              echo "${PACKAGE_NAME}@${PACKAGE_VERSION} is visible on npm"
+              exit 0
+            fi
+            echo "Waiting for npm registry visibility (attempt ${attempt}/12)..."
+            sleep 5
+          done
+          echo "npm package did not become visible in time"
+          exit 1
+
+      - name: Install MCP Registry publisher
+        run: |
+          curl --fail --location \
+            "https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_$(uname -s | tr '[:upper:]' '[:lower:]')_$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/').tar.gz" \
+            | tar xz mcp-publisher
+          ./mcp-publisher --help
+
+      - name: Authenticate to MCP Registry with GitHub OIDC
+        run: ./mcp-publisher login github-oidc
+
+      - name: Publish server metadata to MCP Registry
+        run: ./mcp-publisher publish
