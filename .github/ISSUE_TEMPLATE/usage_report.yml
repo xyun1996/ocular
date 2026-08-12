@@ -1,0 +1,113 @@
+name: Usage / integration report
+description: Share a real ocular workflow, integration, or deployment so maintainers can improve compatibility and documentation.
+title: "[usage] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for sharing a real-world ocular workflow. Usage reports help prioritize compatibility work and document where the project is useful.
+
+        **Do not include API keys, MCP auth tokens, private endpoint credentials, proprietary screenshots, or confidential model output.** Redact private hostnames or organization details when necessary.
+
+  - type: input
+    id: ocular-version
+    attributes:
+      label: ocular version or commit
+      description: Published package version, Git tag, or commit SHA used.
+      placeholder: "0.1.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: install-method
+    attributes:
+      label: Installation / deployment method
+      options:
+        - npm package (local stdio)
+        - source checkout (local stdio)
+        - remote HTTP deployment
+        - container / custom deployment
+        - other
+    validations:
+      required: true
+
+  - type: input
+    id: mcp-client
+    attributes:
+      label: MCP client or coding agent
+      description: Name and version when known.
+      placeholder: "Claude Code, custom MCP client, etc."
+    validations:
+      required: true
+
+  - type: input
+    id: provider
+    attributes:
+      label: Vision provider / endpoint type
+      description: Provider or deployment name only. Do not include credentials or private URLs.
+      placeholder: "OpenAI-compatible hosted endpoint, Ollama, vLLM, etc."
+    validations:
+      required: true
+
+  - type: input
+    id: model
+    attributes:
+      label: Vision model
+      description: Exact model identifier when it is safe to share.
+      placeholder: "model-name"
+    validations:
+      required: true
+
+  - type: textarea
+    id: workflow
+    attributes:
+      label: What workflow are you using ocular for?
+      description: Describe the real task and which ocular tools are involved.
+      placeholder: |
+        Example: A coding agent receives UI screenshots from bug reports, calls analyze_ui_screenshot, then inspects the frontend repository using the structured observations.
+    validations:
+      required: true
+
+  - type: textarea
+    id: value
+    attributes:
+      label: What is working well?
+      description: Concrete outcomes are more useful than general praise.
+      placeholder: "What does ocular enable or make easier in this workflow?"
+    validations:
+      required: true
+
+  - type: textarea
+    id: friction
+    attributes:
+      label: Friction, limitations, or missing capabilities
+      description: Setup issues, provider quirks, output problems, missing tools, latency, or documentation gaps.
+      placeholder: "What should be improved?"
+    validations:
+      required: false
+
+  - type: textarea
+    id: reproducibility
+    attributes:
+      label: Reproducible details (optional)
+      description: Share sanitized config patterns, commands, or public sample inputs if they would help reproduce the workflow.
+      placeholder: "No secrets or private data."
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: Privacy check
+      options:
+        - label: I have removed API keys, auth tokens, private credentials, and confidential data from this report.
+          required: true
+
+  - type: checkboxes
+    id: citation-permission
+    attributes:
+      label: Public project documentation
+      description: Optional. This only refers to linking this already-public GitHub issue; it does not grant permission to republish private information.
+      options:
+        - label: Maintainers may link this public usage report from ocular documentation as an example of real-world adoption.
+          required: false
