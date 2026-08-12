@@ -38,3 +38,30 @@ jobs:
           }
           console.log(`npm package contains ${pack.files.length} files (${pack.size} bytes)`);
           NODE
+
+      - name: Verify packed CLI entrypoint
+        run: |
+          npm pack --json > packed.json
+          TARBALL="$(node -e "const p=require('./packed.json')[0]; process.stdout.write(p.filename)")"
+          TMP_DIR="$(mktemp -d)"
+          cd "$TMP_DIR"
+          npm init -y >/dev/null 2>&1
+          npm install --ignore-scripts "$GITHUB_WORKSPACE/$TARBALL" >/dev/null
+
+          set +e
+          ./node_modules/.bin/ocular >stdout.log 2>stderr.log
+          STATUS=$?
+          set -e
+
+          if [ "$STATUS" -eq 0 ]; then
+            echo "Expected ocular to exit because provider configuration is intentionally absent"
+            exit 1
+          fi
+
+          if ! grep -q "OCULAR_BASE_URL is missing" stderr.log; then
+            echo "Packed CLI did not reach ocular configuration validation"
+            cat stderr.log
+            exit 1
+          fi
+
+          echo "Packed ocular CLI executable started successfully and reached configuration validation"
