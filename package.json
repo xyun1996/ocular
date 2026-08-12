@@ -30,8 +30,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "dev": "tsx src/index.ts",
-    "check": "npm run build && npm test && node --check scripts/provider-smoke.mjs",
+    "check": "npm run build && npm test && node --check scripts/provider-smoke.mjs && node --check scripts/benchmark-fixtures.mjs",
     "smoke:provider": "npm run build && node scripts/provider-smoke.mjs",
+    "bench:fixtures": "npm run build && node scripts/benchmark-fixtures.mjs",
     "prepublishOnly": "npm run check"
   },
   "engines": {
