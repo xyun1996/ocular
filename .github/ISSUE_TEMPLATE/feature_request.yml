@@ -1,0 +1,44 @@
+name: Feature request
+description: Suggest an improvement, integration, tool, or workflow
+title: "[Feature]: "
+labels: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Feature requests are especially useful when they describe a real coding-agent workflow or interoperability problem.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or use case
+      description: What agent workflow is difficult or impossible today?
+      placeholder: Describe the real workflow first, before proposing an implementation.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: What should ocular do differently?
+    validations:
+      required: true
+  - type: input
+    id: client
+    attributes:
+      label: MCP client or agent
+      placeholder: Claude Code, Codex, custom MCP client, etc.
+  - type: input
+    id: provider
+    attributes:
+      label: Vision provider/model, if relevant
+      placeholder: Provider and model name only; no credentials.
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Existing workarounds, tools, or approaches you have tried.
+  - type: textarea
+    id: adoption
+    attributes:
+      label: Who would benefit?
+      description: If you know of other users, projects, or workflows with the same need, describe them here.
