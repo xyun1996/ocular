@@ -46,6 +46,12 @@ image bytes -> PUT /upload -> file_id -> MCP vision tool -> structured result
 
 See [Architecture](docs/architecture.md) for the upload and caching model.
 
+## Demo
+
+Want to see the full handoff from screenshot to coding-agent evidence? Read the [end-to-end demo](docs/demo.md).
+
+It walks through a remote image upload, a `diagnose_error_screenshot` call, the structured fields returned to the agent, and how that evidence is combined with repository context. Example model output is explicitly marked representative rather than presented as a benchmark.
+
 ## Quick start
 
 ### 1. Build from source
