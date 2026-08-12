@@ -31,6 +31,7 @@
     "test:watch": "vitest",
     "dev": "tsx src/index.ts",
     "check": "npm run build && npm test",
+    "smoke:provider": "npm run build && node scripts/provider-smoke.mjs",
     "prepublishOnly": "npm run check"
   },
   "engines": {
